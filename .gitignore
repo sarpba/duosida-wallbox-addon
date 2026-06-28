@@ -13,7 +13,7 @@ __pycache__/
 *.swp
 *.swo
 
-# Reverse-engineering and development workspace, not needed for the HA add-on repo
+# Local application files
 /duosida_app/
 /duosida_probe.py
 /duosida_web.py
