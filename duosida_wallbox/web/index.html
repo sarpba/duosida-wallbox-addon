@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Duosida Wallbox</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <section>
+          <p class="eyebrow">Local LAN dashboard</p>
+          <h1>Duosida Wallbox</h1>
+          <p id="deviceMeta" class="muted">Waiting for charger data</p>
+        </section>
+        <section class="connection">
+          <span id="statusDot" class="dot"></span>
+          <div>
+            <strong id="stateLabel">Connecting</strong>
+            <span id="updatedLabel">No update yet</span>
+          </div>
+          <button id="refreshButton" type="button" title="Refresh now">Refresh</button>
+        </section>
+      </header>
+
+      <section class="hero">
+        <div class="charger">
+          <div class="charger-face">
+            <span class="port"></span>
+            <span class="cable"></span>
+            <span class="bolt">EV</span>
+          </div>
+        </div>
+
+        <div class="primary-readout">
+          <p>Status</p>
+          <strong id="chargeStatus">Unknown</strong>
+          <span id="errorStatus">No error data</span>
+        </div>
+
+        <div class="gauge-grid">
+          <article class="gauge-card">
+            <div class="gauge" id="currentGauge"><span id="currentValue">--</span></div>
+            <p>Current</p>
+            <strong id="currentUnit">A</strong>
+          </article>
+          <article class="gauge-card">
+            <div class="gauge" id="voltageGauge"><span id="voltageValue">--</span></div>
+            <p>Voltage</p>
+            <strong id="voltageUnit">V</strong>
+          </article>
+          <article class="gauge-card">
+            <div class="gauge" id="tempGauge"><span id="tempValue">--</span></div>
+            <p>Temperature</p>
+            <strong id="tempUnit">C</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="metrics">
+        <article>
+          <span>Power</span>
+          <strong id="powerValue">-- W</strong>
+          <div class="bar"><i id="powerBar"></i></div>
+        </article>
+        <article>
+          <span>Energy interval</span>
+          <strong id="energyValue">-- kWh</strong>
+          <div class="bar"><i id="energyBar"></i></div>
+        </article>
+        <article>
+          <span>Max configured current</span>
+          <strong id="maxCurrentValue">-- A</strong>
+          <div class="bar"><i id="maxCurrentBar"></i></div>
+        </article>
+      </section>
+
+      <section class="settings-panel">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Konfiguráció</p>
+            <h2>Állítható töltőparaméterek</h2>
+          </div>
+          <span id="settingsStatus">Nincs módosítás</span>
+        </div>
+
+        <form id="maxCurrentForm" class="setting-card">
+          <div>
+            <label for="maxCurrentInput">Maximális töltőáram</label>
+            <p>A töltő <code>VendorMaxWorkCurrent</code> értékét állítja. Csak olyan értéket adj meg, amit a hálózat és a kábel biztonságosan elbír.</p>
+          </div>
+          <div class="current-control">
+            <input id="maxCurrentRange" type="range" min="6" max="32" step="1" value="16" />
+            <label class="amp-input">
+              <input id="maxCurrentInput" type="number" min="6" max="32" step="1" value="16" />
+              <span>A</span>
+            </label>
+            <button id="saveCurrentButton" type="submit">Mentés</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="chart-panel">
+        <div class="panel-title">
+          <div>
+            <p class="eyebrow">Live trend</p>
+            <h2>Voltage, current and temperature</h2>
+          </div>
+          <span id="sampleCount">0 samples</span>
+        </div>
+        <canvas id="trendCanvas" width="1200" height="360"></canvas>
+      </section>
+
+      <section class="details">
+        <article>
+          <span>Serial</span>
+          <strong id="serialValue">--</strong>
+        </article>
+        <article>
+          <span>Firmware</span>
+          <strong id="firmwareValue">--</strong>
+        </article>
+        <article>
+          <span>Probe</span>
+          <strong id="probeValue">--</strong>
+        </article>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

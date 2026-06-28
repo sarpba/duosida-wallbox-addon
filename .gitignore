@@ -1,0 +1,28 @@
+# Python/runtime artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local/editor files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Reverse-engineering and development workspace, not needed for the HA add-on repo
+/duosida_app/
+/duosida_probe.py
+/duosida_web.py
+/web/
+
+# Local build/test artifacts
+*.tar
+*.tgz
+*.zip
+*.apk
+*.jar
+.docker-build/
