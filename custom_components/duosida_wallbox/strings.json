@@ -3,15 +3,17 @@
     "step": {
       "user": {
         "title": "Duosida Wallbox",
-        "description": "Connect to the Duosida Wallbox add-on HTTP API.",
+        "description": "Connect directly to the Duosida charger on the local network.",
         "data": {
-          "base_url": "Add-on API URL",
+          "charger_host": "Charger IP address",
+          "port": "TCP port",
+          "probe_duration": "Probe duration",
           "id_tag": "Remote start ID tag"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot connect to the add-on API."
+      "cannot_connect": "Cannot connect to the charger."
     },
     "abort": {
       "already_configured": "This Duosida Wallbox API is already configured."
@@ -33,6 +35,8 @@
       "connector_id": { "name": "Connector ID" },
       "transaction_id": { "name": "Transaction ID" },
       "vendor_transaction_id": { "name": "Vendor transaction ID" },
+      "remote_start_status": { "name": "Remote start status" },
+      "remote_stop_status": { "name": "Remote stop status" },
       "configured_max_current": { "name": "Configured max current" },
       "configured_max_voltage": { "name": "Configured max voltage" },
       "configured_min_voltage": { "name": "Configured min voltage" },
@@ -52,7 +56,9 @@
       "charging": { "name": "Charging" }
     },
     "button": {
-      "refresh": { "name": "Refresh" }
+      "refresh": { "name": "Refresh" },
+      "start_charging": { "name": "Start charging" },
+      "stop_charging": { "name": "Stop charging" }
     }
   }
 }

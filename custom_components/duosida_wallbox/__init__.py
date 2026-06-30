@@ -2,21 +2,29 @@
 
 from __future__ import annotations
 
-from aiohttp import ClientSession
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import DuosidaApiClient
-from .const import CONF_BASE_URL, DOMAIN, PLATFORMS
+from .const import (
+    CONF_CHARGER_HOST,
+    CONF_PORT,
+    CONF_PROBE_DURATION,
+    DEFAULT_PORT,
+    DEFAULT_PROBE_DURATION,
+    DOMAIN,
+    PLATFORMS,
+)
 from .coordinator import DuosidaDataUpdateCoordinator
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Duosida Wallbox from a config entry."""
-    session: ClientSession = async_get_clientsession(hass)
-    client = DuosidaApiClient(session, entry.data[CONF_BASE_URL])
+    client = DuosidaApiClient(
+        host=entry.data[CONF_CHARGER_HOST],
+        port=int(entry.data.get(CONF_PORT, DEFAULT_PORT)),
+        probe_duration=int(entry.data.get(CONF_PROBE_DURATION, DEFAULT_PROBE_DURATION)),
+    )
     coordinator = DuosidaDataUpdateCoordinator(hass, entry, client)
 
     await coordinator.async_config_entry_first_refresh()

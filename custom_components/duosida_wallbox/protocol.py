@@ -171,6 +171,11 @@ CONFIGURATION_STATUS = {
     3: "NotSupported",
 }
 
+REMOTE_START_STOP_STATUS = {
+    0: "Accepted",
+    1: "Rejected",
+}
+
 OCPP_CASE = {
     1: "AuthorizeConf",
     2: "AuthorizeReq",
@@ -351,6 +356,14 @@ def decode_remote_stop_transaction_req(payload: bytes) -> Dict[str, object]:
     for field, wire_type, value in parse_message(payload):
         if field == 1 and wire_type == 0:
             out["transactionId"] = value
+    return out
+
+
+def decode_remote_start_stop_conf(payload: bytes) -> Dict[str, object]:
+    out: Dict[str, object] = {}
+    for field, wire_type, value in parse_message(payload):
+        if field == 1 and wire_type == 0:
+            out["status"] = REMOTE_START_STOP_STATUS.get(value, value)
     return out
 
 
@@ -576,8 +589,12 @@ def decode_ocpp_message(payload: bytes) -> Dict[str, object]:
                 out["data"] = decode_data_transfer_req(value)  # type: ignore[arg-type]
             elif field == 32:
                 out["data"] = decode_meter_values_req(value)  # type: ignore[arg-type]
+            elif field == 33:
+                out["data"] = decode_remote_start_stop_conf(value)  # type: ignore[arg-type]
             elif field == 34:
                 out["data"] = decode_remote_start_transaction_req(value)  # type: ignore[arg-type]
+            elif field == 35:
+                out["data"] = decode_remote_start_stop_conf(value)  # type: ignore[arg-type]
             elif field == 36:
                 out["data"] = decode_remote_stop_transaction_req(value)  # type: ignore[arg-type]
             elif field == 48:
@@ -649,6 +666,16 @@ def update_state_from_decoded(decoded: Dict[str, object], state: Dict[str, objec
     if data_case == "ChangeConfigurationConf":
         for key, value in data.items():
             state[f"change_configuration_{key}"] = value
+        return
+
+    if data_case == "RemoteStartTransactionConf":
+        for key, value in data.items():
+            state[f"remote_start_{key}"] = value
+        return
+
+    if data_case == "RemoteStopTransactionConf":
+        for key, value in data.items():
+            state[f"remote_stop_{key}"] = value
         return
 
     if data_case == "MeterValuesReq":

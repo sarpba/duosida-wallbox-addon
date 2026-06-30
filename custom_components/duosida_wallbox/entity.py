@@ -47,7 +47,6 @@ class DuosidaEntity(CoordinatorEntity[DuosidaDataUpdateCoordinator]):
             name="Duosida Wallbox",
             serial_number=str(values.get("chargePointSerialNumber") or self.serial),
             sw_version=str(values.get("firmwareVersion")) if values.get("firmwareVersion") else None,
-            configuration_url=self.coordinator.config_entry.data.get("base_url"),
         )
 
     def value(self, key: str | None = None) -> Any:

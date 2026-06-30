@@ -1,24 +1,18 @@
-# Duosida Wallbox Home Assistant Add-on Repository
+# Duosida Wallbox Home Assistant Integration
 
-Home Assistant Supervisor add-on repository for a Duosida EV wallbox local LAN dashboard.
+HACS custom integration for Duosida EV wallbox local LAN control.
 
 ## Warning / Figyelmeztetes
 
 This repository is under active development and is not an official Duosida or Home Assistant project. It controls EV charger settings over a reverse-engineered local protocol. Use it only if you understand the risks.
 
-No warranty is provided. The author takes no responsibility for damage, malfunction, incorrect charging current, electrical issues, data loss, or any other consequence. Everyone uses this add-on entirely at their own risk.
+No warranty is provided. The author takes no responsibility for damage, malfunction, incorrect charging current, electrical issues, data loss, or any other consequence. Everyone uses this integration entirely at their own risk.
 
 Ez a repository fejlesztes alatt all, nem hivatalos Duosida vagy Home Assistant projekt. A tolto beallitasait egy visszafejtett lokal protokollon keresztul vezerli. Csak akkor hasznald, ha erted a kockazatokat.
 
 Garancia nincs. A szerzo semmilyen felelosseget nem vall karert, hibas mukodesert, rosszul beallitott toltoaramert, elektromos problemaert, adatvesztesert vagy barmilyen kovetkezmenyert. Mindenki kizarolag sajat felelossegere hasznalja.
 
-## Add-on
-
-- `duosida_wallbox`: web dashboard and local TCP/9988 control for Duosida chargers.
-
 ## HACS Integration
-
-This repository also contains a Home Assistant custom integration:
 
 - Domain: `duosida_wallbox`
 - HACS type: Integration
@@ -27,9 +21,9 @@ This repository also contains a Home Assistant custom integration:
   - binary sensors for online, charging, and fault state
   - number entity for maximum charging current
   - switch entity for remote start/stop charging
-  - button entity for manual refresh
+  - button entities for manual refresh, remote start, and remote stop
 
-The integration talks to the add-on HTTP API. Keep the add-on installed and running.
+The integration talks directly to the charger on TCP/9988. The add-on is not required for normal Home Assistant use.
 
 ### HACS installation
 
@@ -43,25 +37,15 @@ The integration talks to the add-on HTTP API. Keep the add-on installed and runn
 
 ### Integration configuration
 
-The setup flow asks for the add-on API URL.
+The setup flow asks for:
 
-Try the default first:
+- `charger_host`: charger IP address, default `192.168.7.140`
+- `port`: charger TCP port, default `9988`
+- `probe_duration`: seconds to wait for charger responses, default `8`
+- `id_tag`: remote start ID tag, default `HA`
 
-```text
-http://duosida_wallbox:8765
-```
+The Home Assistant host must be able to reach the charger IP directly. The original mobile app should not hold the charger connection while Home Assistant is polling or controlling it.
 
-If Home Assistant cannot resolve the add-on hostname, expose the add-on network port `8765` in the add-on settings and use:
+## Optional Web Dashboard
 
-```text
-http://<home-assistant-ip>:8765
-```
-
-For remote start, the default ID tag is `HA`.
-
-## Installation
-
-1. In Home Assistant, open **Settings -> Add-ons -> Add-on Store**.
-2. Open the menu, choose **Repositories**, and add your GitHub repository URL.
-3. Install **Duosida Wallbox**.
-4. Configure `charger_host`, then start the add-on and open the Web UI.
+The old add-on/web dashboard is not required by the HACS integration. If present locally, it lives under `optional_web_dashboard/`, which is ignored by git.

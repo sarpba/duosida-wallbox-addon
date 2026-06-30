@@ -7,10 +7,19 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import DuosidaApiClient, DuosidaApiError
-from .const import CONF_BASE_URL, CONF_ID_TAG, DEFAULT_BASE_URL, DEFAULT_ID_TAG, DOMAIN
+from .const import (
+    CONF_CHARGER_HOST,
+    CONF_ID_TAG,
+    CONF_PORT,
+    CONF_PROBE_DURATION,
+    DEFAULT_CHARGER_HOST,
+    DEFAULT_ID_TAG,
+    DEFAULT_PORT,
+    DEFAULT_PROBE_DURATION,
+    DOMAIN,
+)
 
 
 class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -23,25 +32,43 @@ class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
 
         if user_input is not None:
-            base_url = str(user_input[CONF_BASE_URL]).strip().rstrip("/")
-            client = DuosidaApiClient(async_get_clientsession(self.hass), base_url)
+            host = str(user_input[CONF_CHARGER_HOST]).strip()
+            port = int(user_input[CONF_PORT])
+            probe_duration = int(user_input[CONF_PROBE_DURATION])
+            client = DuosidaApiClient(host=host, port=port, probe_duration=probe_duration)
             try:
                 state = await client.async_get_state()
             except DuosidaApiError:
                 errors["base"] = "cannot_connect"
             else:
-                await self.async_set_unique_id(base_url)
+                unique_id = str(
+                    state.data.get("chargePointSerialNumber")
+                    or state.data.get("client_id")
+                    or f"{host}:{port}"
+                )
+                await self.async_set_unique_id(unique_id)
                 self._abort_if_unique_id_configured()
                 data = {
-                    CONF_BASE_URL: base_url,
+                    CONF_CHARGER_HOST: host,
+                    CONF_PORT: port,
+                    CONF_PROBE_DURATION: probe_duration,
                     CONF_ID_TAG: str(user_input.get(CONF_ID_TAG) or DEFAULT_ID_TAG),
                 }
-                title = state.data.get("chargePointSerialNumber") or state.data.get("chargePointModel") or "Duosida Wallbox"
+                title = (
+                    state.data.get("chargePointSerialNumber")
+                    or state.data.get("chargePointModel")
+                    or "Duosida Wallbox"
+                )
                 return self.async_create_entry(title=str(title), data=data)
 
         schema = vol.Schema(
             {
-                vol.Required(CONF_BASE_URL, default=DEFAULT_BASE_URL): str,
+                vol.Required(CONF_CHARGER_HOST, default=DEFAULT_CHARGER_HOST): str,
+                vol.Required(CONF_PORT, default=DEFAULT_PORT): vol.All(int, vol.Range(min=1, max=65535)),
+                vol.Required(CONF_PROBE_DURATION, default=DEFAULT_PROBE_DURATION): vol.All(
+                    int,
+                    vol.Range(min=3, max=60),
+                ),
                 vol.Optional(CONF_ID_TAG, default=DEFAULT_ID_TAG): str,
             }
         )

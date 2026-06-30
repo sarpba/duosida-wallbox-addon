@@ -4,11 +4,15 @@ from __future__ import annotations
 
 DOMAIN = "duosida_wallbox"
 
-CONF_BASE_URL = "base_url"
+CONF_CHARGER_HOST = "charger_host"
 CONF_ID_TAG = "id_tag"
+CONF_PORT = "port"
+CONF_PROBE_DURATION = "probe_duration"
 
-DEFAULT_BASE_URL = "http://duosida_wallbox:8765"
+DEFAULT_CHARGER_HOST = "192.168.7.140"
 DEFAULT_ID_TAG = "HA"
+DEFAULT_PORT = 9988
+DEFAULT_PROBE_DURATION = 8
 DEFAULT_SCAN_INTERVAL = 30
 
 PLATFORMS = ["sensor", "binary_sensor", "number", "switch", "button"]

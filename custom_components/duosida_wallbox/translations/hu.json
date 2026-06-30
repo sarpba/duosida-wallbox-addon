@@ -3,15 +3,17 @@
     "step": {
       "user": {
         "title": "Duosida Wallbox",
-        "description": "Kapcsolodas a Duosida Wallbox add-on HTTP API-hoz.",
+        "description": "Kozvetlen kapcsolodas a helyi halozaton levo Duosida toltohoz.",
         "data": {
-          "base_url": "Add-on API URL",
+          "charger_host": "Tolto IP cime",
+          "port": "TCP port",
+          "probe_duration": "Probe idotartam",
           "id_tag": "Remote start ID tag"
         }
       }
     },
     "error": {
-      "cannot_connect": "Nem lehet csatlakozni az add-on API-hoz."
+      "cannot_connect": "Nem lehet csatlakozni a toltohoz."
     },
     "abort": {
       "already_configured": "Ez a Duosida Wallbox API mar be van allitva."
@@ -33,6 +35,8 @@
       "connector_id": { "name": "Csatlakozo ID" },
       "transaction_id": { "name": "Tranzakcio ID" },
       "vendor_transaction_id": { "name": "Gyartoi tranzakcio ID" },
+      "remote_start_status": { "name": "Tavoli inditas allapota" },
+      "remote_stop_status": { "name": "Tavoli leallitas allapota" },
       "configured_max_current": { "name": "Beallitott maximum aram" },
       "configured_max_voltage": { "name": "Beallitott maximum feszultseg" },
       "configured_min_voltage": { "name": "Beallitott minimum feszultseg" },
@@ -52,7 +56,9 @@
       "charging": { "name": "Toltes" }
     },
     "button": {
-      "refresh": { "name": "Frissites" }
+      "refresh": { "name": "Frissites" },
+      "start_charging": { "name": "Toltes inditasa" },
+      "stop_charging": { "name": "Toltes leallitasa" }
     }
   }
 }

@@ -18,6 +18,7 @@ __pycache__/
 /duosida_probe.py
 /duosida_web.py
 /web/
+/optional_web_dashboard/
 
 # Local build/test artifacts
 *.tar

@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
-    """Coordinator that polls the add-on state endpoint."""
+    """Coordinator that polls the charger directly."""
 
     config_entry: ConfigEntry
 
@@ -29,6 +29,7 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
         client: DuosidaApiClient,
     ) -> None:
         self.client = client
+        self.config_entry = config_entry
         scan_interval = config_entry.options.get("scan_interval", DEFAULT_SCAN_INTERVAL)
         super().__init__(
             hass,
@@ -44,7 +45,7 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
 
     @property
     def last_error(self) -> str | None:
-        """Return the latest add-on error."""
+        """Return the latest charger communication error."""
         return self.data.error if self.data else None
 
     async def _async_update_data(self) -> DuosidaState:
@@ -54,12 +55,12 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
             raise UpdateFailed(str(exc)) from exc
 
     async def async_command_refresh(self) -> None:
-        """Ask the add-on to poll the charger now."""
+        """Poll the charger now."""
         try:
-            await self.client.async_refresh()
+            state = await self.client.async_refresh()
         except DuosidaApiError as exc:
             raise HomeAssistantError(str(exc)) from exc
-        await self.async_request_refresh()
+        self.async_set_updated_data(state)
 
     async def async_set_max_current(self, value: float) -> None:
         """Set maximum charging current."""
