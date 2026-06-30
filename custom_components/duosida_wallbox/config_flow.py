@@ -8,7 +8,6 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 
-from .api import DuosidaApiClient, DuosidaApiError
 from .const import (
     CONF_CHARGER_HOST,
     CONF_PORT,
@@ -33,30 +32,14 @@ class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             host = str(user_input[CONF_CHARGER_HOST]).strip()
             port = int(user_input[CONF_PORT])
             probe_duration = int(user_input[CONF_PROBE_DURATION])
-            client = DuosidaApiClient(host=host, port=port, probe_duration=probe_duration)
-            try:
-                state = await client.async_get_state()
-            except DuosidaApiError:
-                errors["base"] = "cannot_connect"
-            else:
-                unique_id = str(
-                    state.data.get("chargePointSerialNumber")
-                    or state.data.get("client_id")
-                    or f"{host}:{port}"
-                )
-                await self.async_set_unique_id(unique_id)
-                self._abort_if_unique_id_configured()
-                data = {
-                    CONF_CHARGER_HOST: host,
-                    CONF_PORT: port,
-                    CONF_PROBE_DURATION: probe_duration,
-                }
-                title = (
-                    state.data.get("chargePointSerialNumber")
-                    or state.data.get("chargePointModel")
-                    or "Duosida Wallbox"
-                )
-                return self.async_create_entry(title=str(title), data=data)
+            await self.async_set_unique_id(f"{host}:{port}")
+            self._abort_if_unique_id_configured()
+            data = {
+                CONF_CHARGER_HOST: host,
+                CONF_PORT: port,
+                CONF_PROBE_DURATION: probe_duration,
+            }
+            return self.async_create_entry(title=f"Duosida Wallbox {host}", data=data)
 
         schema = vol.Schema(
             {
