@@ -41,8 +41,9 @@ The setup flow asks for:
 - `charger_host`: charger IP address, default `192.168.7.140`
 - `port`: charger TCP port, default `9988`
 - `probe_duration`: seconds to wait for charger responses, default `15`
+- update interval: `20` seconds
 
-The Home Assistant host must be able to reach the charger IP directly. The original mobile app should not hold the charger connection while Home Assistant is polling or controlling it.
+The Home Assistant host must be able to reach the charger IP directly. The original mobile app should not hold the charger connection while Home Assistant is polling or controlling it. If the charger becomes unstable, increase the update interval or lower `probe_duration`; a 15 second probe with a 20 second update interval keeps the TCP session open very often.
 
 ### Debug logging
 
