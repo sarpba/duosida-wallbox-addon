@@ -171,7 +171,7 @@ class DuosidaSensor(DuosidaEntity, SensorEntity):
     @property
     def native_value(self) -> Any:
         """Return sensor value."""
-        value = self.value()
+        value = self.raw_value()
         if value in (None, ""):
             return None
         if self.entity_description.device_class is not None or self.entity_description.state_class is not None:

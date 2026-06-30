@@ -34,7 +34,7 @@ class DuosidaEntity(CoordinatorEntity[DuosidaDataUpdateCoordinator]):
     @property
     def available(self) -> bool:
         """Return entity availability."""
-        return super().available and self.coordinator.data is not None
+        return bool(self.coordinator.data is not None)
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -49,6 +49,6 @@ class DuosidaEntity(CoordinatorEntity[DuosidaDataUpdateCoordinator]):
             sw_version=str(values.get("firmwareVersion")) if values.get("firmwareVersion") else None,
         )
 
-    def value(self, key: str | None = None) -> Any:
+    def raw_value(self, key: str | None = None) -> Any:
         """Return raw charger data value."""
         return self.coordinator.values.get(key or self._key)

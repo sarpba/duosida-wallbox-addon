@@ -40,7 +40,7 @@ class DuosidaMaxCurrentNumber(DuosidaEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return current max current value."""
         for key in ("config_maxWorkCurrent", "current_offered", "current_import"):
-            value = self.value(key)
+            value = self.raw_value(key)
             try:
                 current = round(float(value))
             except (TypeError, ValueError):
