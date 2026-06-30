@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import time
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -52,6 +53,17 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
         try:
             return await self.client.async_get_state()
         except DuosidaApiError as exc:
+            if self.data is not None:
+                _LOGGER.warning("Duosida poll failed, keeping previous state: %s", exc)
+                return DuosidaState(
+                    ok=False,
+                    data=self.data.data,
+                    error=str(exc),
+                    updated_at=self.data.updated_at,
+                    age=time.time() - self.data.updated_at if self.data.updated_at else None,
+                    duration=None,
+                    last_command=self.data.last_command,
+                )
             raise UpdateFailed(str(exc)) from exc
 
     async def async_command_refresh(self) -> None:
@@ -68,4 +80,16 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
             state = await self.client.async_set_max_current(value)
         except DuosidaApiError as exc:
             raise HomeAssistantError(str(exc)) from exc
+        if self.data is not None:
+            merged_data = dict(self.data.data)
+            merged_data.update(state.data)
+            state = DuosidaState(
+                ok=state.ok,
+                data=merged_data,
+                error=state.error,
+                updated_at=state.updated_at,
+                age=state.age,
+                duration=state.duration,
+                last_command=state.last_command,
+            )
         self.async_set_updated_data(state)

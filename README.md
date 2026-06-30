@@ -44,6 +44,19 @@ The setup flow asks for:
 
 The Home Assistant host must be able to reach the charger IP directly. The original mobile app should not hold the charger connection while Home Assistant is polling or controlling it.
 
+### Debug logging
+
+Add this to `configuration.yaml`, then restart Home Assistant:
+
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.duosida_wallbox: debug
+```
+
+Logs are visible under **Settings -> System -> Logs**. Useful messages include poll duration, decoded frame count, decoded state keys, and maximum current command/verification status.
+
 ## Optional Web Dashboard
 
 The old add-on/web dashboard is not required by the HACS integration. If present locally, it lives under `optional_web_dashboard/`, which is ignored by git.

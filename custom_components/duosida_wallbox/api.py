@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import socket
 import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
 from . import protocol
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class DuosidaApiError(Exception):
@@ -59,6 +62,12 @@ class DuosidaApiClient:
 
     def _get_state(self) -> DuosidaState:
         started = time.time()
+        _LOGGER.debug(
+            "Polling Duosida charger at %s:%s for up to %ss",
+            self._host,
+            self._port,
+            self._probe_duration,
+        )
         payload = protocol.build_trigger_boot(self._client_id, self._message_id())
         frames = self._recv(
             payload,
@@ -71,8 +80,15 @@ class DuosidaApiClient:
         )
         data = protocol.build_state(frames)
         if not data:
+            _LOGGER.debug("Duosida poll finished with %s frames but no decoded state", len(frames))
             raise DuosidaApiError(f"No response from charger on TCP/{self._port}")
         self._update_client_id(data)
+        _LOGGER.debug(
+            "Duosida poll finished in %.2fs with %s frames and keys: %s",
+            time.time() - started,
+            len(frames),
+            sorted(data),
+        )
         return self._state(data, started)
 
     def _set_max_current(self, value: float) -> DuosidaState:
@@ -81,6 +97,7 @@ class DuosidaApiClient:
         if not 6 <= value <= 32:
             raise DuosidaApiError("Maximum current must be between 6 and 32 A")
 
+        _LOGGER.debug("Setting Duosida max current to %s A", value)
         command_data = self._command_state(
             lambda message_id: protocol.build_change_configuration(
                 self._client_id,
@@ -91,6 +108,7 @@ class DuosidaApiClient:
             duration=max(5, min(self._probe_duration, 8)),
         )
         status = command_data.get("change_configuration_status")
+        _LOGGER.debug("Duosida max current command status: %s", status)
         if status in {"Rejected", "NotSupported"}:
             raise DuosidaApiError(f"Charger rejected configuration change: {status}")
 
@@ -117,6 +135,7 @@ class DuosidaApiClient:
                 raise DuosidaApiError(verify_error or "Charger did not confirm configuration change")
 
         configured = data.get("config_maxWorkCurrent")
+        _LOGGER.debug("Duosida max current verification reported: %s A", configured)
         if configured is not None and abs(float(configured) - value) > 0.1:
             raise DuosidaApiError(f"Charger still reports {configured} A after saving {value:g} A")
         if configured is None and status in {"Accepted", "RebootRequired"}:
@@ -137,10 +156,13 @@ class DuosidaApiClient:
         )
 
     def _command_state(self, payload_factory: Callable[[int], bytes], duration: int) -> dict[str, Any]:
+        _LOGGER.debug("Sending Duosida command and waiting up to %ss", duration)
         frames = self._recv(payload_factory(self._message_id()), duration=duration)
         data = protocol.build_state(frames)
         if not data:
+            _LOGGER.debug("Duosida command finished with %s frames but no decoded state", len(frames))
             raise DuosidaApiError(f"No response from charger on TCP/{self._port}")
+        _LOGGER.debug("Duosida command returned keys: %s", sorted(data))
         return data
 
     def _recv(
