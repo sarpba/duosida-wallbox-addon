@@ -171,4 +171,14 @@ class DuosidaSensor(DuosidaEntity, SensorEntity):
     @property
     def native_value(self) -> Any:
         """Return sensor value."""
-        return self.value()
+        value = self.value()
+        if value in (None, ""):
+            return None
+        if self.entity_description.device_class is not None or self.entity_description.state_class is not None:
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return None
+        if isinstance(value, (str, int, float)):
+            return value
+        return str(value)

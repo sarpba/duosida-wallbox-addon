@@ -66,14 +66,19 @@ class DuosidaBinarySensor(DuosidaEntity, BinarySensorEntity):
         self.entity_description = description
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return binary sensor state."""
         if self.entity_description.key == "online":
             return bool(self.coordinator.data and self.coordinator.data.ok)
         if self.entity_description.key == "charging":
             value = self.value("status_status") or self.value("vendor_status")
         elif self.entity_description.key == "fault":
+            error_code = self.value("status_errorCode")
+            if error_code and str(error_code).lower() != "noerror":
+                return True
             value = self.value("status_status") or self.value("vendor_status")
         else:
             value = self.value()
+        if value in (None, ""):
+            return None
         return str(value).lower() in self.entity_description.on_values
