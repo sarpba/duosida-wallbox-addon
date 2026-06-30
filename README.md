@@ -20,7 +20,7 @@ Garancia nincs. A szerzo semmilyen felelosseget nem vall karert, hibas mukodeser
   - sensors for status, error code, current, voltage, power, energy, frequency, temperature, transaction id, and charger configuration
   - binary sensors for online, charging, and fault state
   - number entity for maximum charging current
-  - button entity for manual refresh
+  - button entities for manual refresh, remote start, and remote stop
 
 The integration talks directly to the charger on TCP/9988. The add-on is not required for normal Home Assistant use.
 
@@ -42,6 +42,7 @@ The setup flow asks for:
 - `port`: charger TCP port, default `9988`
 - `probe_duration`: seconds to wait for charger responses, default `15`
 - update interval: `20` seconds
+- `id_tag`: remote start ID tag, default `HA`
 
 The Home Assistant host must be able to reach the charger IP directly. The original mobile app should not hold the charger connection while Home Assistant is polling or controlling it. If the charger becomes unstable, increase the update interval or lower `probe_duration`; a 15 second probe with a 20 second update interval keeps the TCP session open very often.
 

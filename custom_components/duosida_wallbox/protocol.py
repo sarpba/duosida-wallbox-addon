@@ -874,6 +874,24 @@ def build_update_to_flash(client_id: str, message_id: int, update_type: int = 0)
     )
 
 
+def build_remote_start(client_id: str, message_id: int, id_tag: str) -> bytes:
+    inner = encode_field_varint(1, 1) + encode_field_len(2, id_tag.encode("utf-8"))
+    return (
+        encode_field_len(34, inner)
+        + encode_field_len(100, client_id.encode("utf-8"))
+        + encode_field_varint(101, message_id)
+    )
+
+
+def build_remote_stop(client_id: str, message_id: int, transaction_id: int) -> bytes:
+    inner = encode_field_varint(1, transaction_id)
+    return (
+        encode_field_len(36, inner)
+        + encode_field_len(100, client_id.encode("utf-8"))
+        + encode_field_varint(101, message_id)
+    )
+
+
 def build_boot_notification_conf_minimal(message_id: int) -> bytes:
     return encode_field_len(3, encode_field_sint64(1, int(time.time()))) + encode_field_varint(101, message_id)
 

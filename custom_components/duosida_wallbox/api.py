@@ -60,6 +60,14 @@ class DuosidaApiClient:
         async with self._lock:
             return await asyncio.to_thread(self._set_max_current, value)
 
+    async def async_start_charging(self, id_tag: str) -> DuosidaState:
+        async with self._lock:
+            return await asyncio.to_thread(self._set_charging, True, id_tag, None)
+
+    async def async_stop_charging(self, transaction_id: int | None = None) -> DuosidaState:
+        async with self._lock:
+            return await asyncio.to_thread(self._set_charging, False, None, transaction_id)
+
     def _get_state(self) -> DuosidaState:
         started = time.time()
         _LOGGER.debug(
@@ -180,6 +188,47 @@ class DuosidaApiClient:
         _LOGGER.debug("Duosida command returned keys: %s", sorted(data))
         return data
 
+    def _set_charging(self, enabled: bool, id_tag: str | None, transaction_id: int | None) -> DuosidaState:
+        started = time.time()
+        if enabled:
+            command_type = "start_charging"
+            command_value: object = id_tag or "HA"
+            _LOGGER.debug("Sending Duosida remote start with id tag %s", command_value)
+            data = self._command_state(
+                lambda message_id: protocol.build_remote_start(self._client_id, message_id, str(command_value)),
+                duration=max(5, min(self._probe_duration, 8)),
+                require_state=False,
+            )
+            status = data.get("remote_start_status")
+        else:
+            if transaction_id is None:
+                transaction_id = self._last_transaction_id()
+            if transaction_id is None:
+                raise DuosidaApiError("Charger did not report an active transaction id")
+            command_type = "stop_charging"
+            command_value = transaction_id
+            _LOGGER.debug("Sending Duosida remote stop for transaction %s", transaction_id)
+            data = self._command_state(
+                lambda message_id: protocol.build_remote_stop(self._client_id, message_id, transaction_id),
+                duration=max(5, min(self._probe_duration, 8)),
+                require_state=False,
+            )
+            status = data.get("remote_stop_status")
+
+        if status == "Rejected":
+            raise DuosidaApiError(f"Charger rejected {command_type}")
+        self._update_client_id(data)
+        return self._state(
+            data,
+            started,
+            last_command={
+                "type": command_type,
+                "value": command_value,
+                "status": status or "Sent",
+                "updated_at": time.time(),
+            },
+        )
+
     def _recv(
         self,
         payload: bytes,
@@ -222,6 +271,19 @@ class DuosidaApiClient:
         client_id = data.get("client_id") or data.get("chargePointSerialNumber")
         if client_id:
             self._client_id = str(client_id)
+
+    def _last_transaction_id(self) -> int | None:
+        try:
+            state = self._get_state()
+        except DuosidaApiError:
+            return None
+        value = state.data.get("transaction_id") or state.data.get("vendor_transactionId")
+        if value in {None, "", 0, "0"}:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
 
     @staticmethod
     def _message_id() -> int:

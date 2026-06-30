@@ -7,7 +7,8 @@
         "data": {
           "charger_host": "Charger IP address",
           "port": "TCP port",
-          "probe_duration": "Probe duration"
+          "probe_duration": "Probe duration",
+          "id_tag": "Remote start ID tag"
         }
       }
     },
@@ -50,7 +51,9 @@
       "max_current": { "name": "Maximum current" }
     },
     "button": {
-      "refresh": { "name": "Refresh" }
+      "refresh": { "name": "Refresh" },
+      "start_charging": { "name": "Start charging" },
+      "stop_charging": { "name": "Stop charging" }
     }
   }
 }

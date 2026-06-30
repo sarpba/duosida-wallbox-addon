@@ -7,7 +7,8 @@
         "data": {
           "charger_host": "Tolto IP cime",
           "port": "TCP port",
-          "probe_duration": "Probe idotartam"
+          "probe_duration": "Probe idotartam",
+          "id_tag": "Tavoli inditas ID tag"
         }
       }
     },
@@ -50,7 +51,9 @@
       "max_current": { "name": "Maximum aram" }
     },
     "button": {
-      "refresh": { "name": "Frissites" }
+      "refresh": { "name": "Frissites" },
+      "start_charging": { "name": "Toltes inditasa" },
+      "stop_charging": { "name": "Toltes leallitasa" }
     }
   }
 }

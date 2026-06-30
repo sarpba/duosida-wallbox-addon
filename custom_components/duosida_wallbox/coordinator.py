@@ -80,10 +80,30 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
             state = await self.client.async_set_max_current(value)
         except DuosidaApiError as exc:
             raise HomeAssistantError(str(exc)) from exc
+        self.async_set_updated_data(self._merge_state(state))
+
+    async def async_start_charging(self, id_tag: str) -> None:
+        """Send remote start command."""
+        try:
+            state = await self.client.async_start_charging(id_tag)
+        except DuosidaApiError as exc:
+            raise HomeAssistantError(str(exc)) from exc
+        self.async_set_updated_data(self._merge_state(state))
+
+    async def async_stop_charging(self, transaction_id: int | None = None) -> None:
+        """Send remote stop command."""
+        try:
+            state = await self.client.async_stop_charging(transaction_id)
+        except DuosidaApiError as exc:
+            raise HomeAssistantError(str(exc)) from exc
+        self.async_set_updated_data(self._merge_state(state))
+
+    def _merge_state(self, state: DuosidaState) -> DuosidaState:
+        """Merge partial command responses into the previous state."""
         if self.data is not None:
             merged_data = dict(self.data.data)
             merged_data.update(state.data)
-            state = DuosidaState(
+            return DuosidaState(
                 ok=state.ok,
                 data=merged_data,
                 error=state.error,
@@ -92,4 +112,4 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
                 duration=state.duration,
                 last_command=state.last_command,
             )
-        self.async_set_updated_data(state)
+        return state
