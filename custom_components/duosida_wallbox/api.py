@@ -106,6 +106,7 @@ class DuosidaApiClient:
                 f"{value:g}",
             ),
             duration=max(5, min(self._probe_duration, 8)),
+            require_state=False,
         )
         status = command_data.get("change_configuration_status")
         _LOGGER.debug("Duosida max current command status: %s", status)
@@ -132,7 +133,14 @@ class DuosidaApiClient:
             if status in {"Accepted", "RebootRequired"}:
                 data = command_data
             else:
-                raise DuosidaApiError(verify_error or "Charger did not confirm configuration change")
+                _LOGGER.warning(
+                    "Duosida max current verification failed after command status %s; keeping requested value "
+                    "optimistically. Last verification error: %s",
+                    status or "unknown",
+                    verify_error,
+                )
+                data = dict(command_data)
+                data["config_maxWorkCurrent"] = value
 
         configured = data.get("config_maxWorkCurrent")
         _LOGGER.debug("Duosida max current verification reported: %s A", configured)
@@ -141,7 +149,7 @@ class DuosidaApiClient:
         if configured is None and status in {"Accepted", "RebootRequired"}:
             data["config_maxWorkCurrent"] = value
         if status is None:
-            status = data.get("change_configuration_status") or "Verified"
+            status = data.get("change_configuration_status") or "Sent"
 
         self._update_client_id(data)
         return self._state(
@@ -155,12 +163,19 @@ class DuosidaApiClient:
             },
         )
 
-    def _command_state(self, payload_factory: Callable[[int], bytes], duration: int) -> dict[str, Any]:
+    def _command_state(
+        self,
+        payload_factory: Callable[[int], bytes],
+        duration: int,
+        require_state: bool = True,
+    ) -> dict[str, Any]:
         _LOGGER.debug("Sending Duosida command and waiting up to %ss", duration)
         frames = self._recv(payload_factory(self._message_id()), duration=duration)
         data = protocol.build_state(frames)
         if not data:
             _LOGGER.debug("Duosida command finished with %s frames but no decoded state", len(frames))
+            if not require_state:
+                return {}
             raise DuosidaApiError(f"No response from charger on TCP/{self._port}")
         _LOGGER.debug("Duosida command returned keys: %s", sorted(data))
         return data

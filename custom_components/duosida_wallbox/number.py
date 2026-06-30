@@ -39,11 +39,14 @@ class DuosidaMaxCurrentNumber(DuosidaEntity, NumberEntity):
     @property
     def native_value(self) -> float | None:
         """Return current max current value."""
-        value = self.value("config_maxWorkCurrent")
-        try:
-            return round(float(value))
-        except (TypeError, ValueError):
-            return None
+        for key in ("config_maxWorkCurrent", "current_offered", "current_import"):
+            value = self.value(key)
+            try:
+                current = round(float(value))
+            except (TypeError, ValueError):
+                continue
+            return max(6, min(32, current))
+        return None
 
     async def async_set_native_value(self, value: float) -> None:
         """Set maximum charging current."""
