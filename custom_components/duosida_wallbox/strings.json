@@ -52,9 +52,6 @@
     "number": {
       "max_current": { "name": "Maximum current" }
     },
-    "switch": {
-      "charging": { "name": "Charging" }
-    },
     "button": {
       "refresh": { "name": "Refresh" },
       "start_charging": { "name": "Start charging" },

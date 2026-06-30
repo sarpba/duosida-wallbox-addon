@@ -20,7 +20,6 @@ Garancia nincs. A szerzo semmilyen felelosseget nem vall karert, hibas mukodeser
   - sensors for status, error code, current, voltage, power, energy, frequency, temperature, transaction id, and charger configuration
   - binary sensors for online, charging, and fault state
   - number entity for maximum charging current
-  - switch entity for remote start/stop charging
   - button entities for manual refresh, remote start, and remote stop
 
 The integration talks directly to the charger on TCP/9988. The add-on is not required for normal Home Assistant use.

@@ -15,4 +15,4 @@ DEFAULT_PORT = 9988
 DEFAULT_PROBE_DURATION = 8
 DEFAULT_SCAN_INTERVAL = 30
 
-PLATFORMS = ["sensor", "binary_sensor", "number", "switch", "button"]
+PLATFORMS = ["sensor", "binary_sensor", "number", "button"]

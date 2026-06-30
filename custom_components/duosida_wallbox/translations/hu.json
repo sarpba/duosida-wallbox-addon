@@ -52,9 +52,6 @@
     "number": {
       "max_current": { "name": "Maximum aram" }
     },
-    "switch": {
-      "charging": { "name": "Toltes" }
-    },
     "button": {
       "refresh": { "name": "Frissites" },
       "start_charging": { "name": "Toltes inditasa" },
