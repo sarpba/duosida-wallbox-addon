@@ -105,14 +105,6 @@ SENSORS: tuple[DuosidaSensorEntityDescription, ...] = (
         translation_key="vendor_transaction_id",
     ),
     DuosidaSensorEntityDescription(
-        key="remote_start_status",
-        translation_key="remote_start_status",
-    ),
-    DuosidaSensorEntityDescription(
-        key="remote_stop_status",
-        translation_key="remote_stop_status",
-    ),
-    DuosidaSensorEntityDescription(
         key="config_maxWorkCurrent",
         translation_key="configured_max_current",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,

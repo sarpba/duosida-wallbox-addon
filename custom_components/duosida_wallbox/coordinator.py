@@ -69,19 +69,3 @@ class DuosidaDataUpdateCoordinator(DataUpdateCoordinator[DuosidaState]):
         except DuosidaApiError as exc:
             raise HomeAssistantError(str(exc)) from exc
         self.async_set_updated_data(state)
-
-    async def async_start_charging(self, id_tag: str) -> None:
-        """Send remote start command."""
-        try:
-            state = await self.client.async_start_charging(id_tag)
-        except DuosidaApiError as exc:
-            raise HomeAssistantError(str(exc)) from exc
-        self.async_set_updated_data(state)
-
-    async def async_stop_charging(self, transaction_id: int | None = None) -> None:
-        """Send remote stop command."""
-        try:
-            state = await self.client.async_stop_charging(transaction_id)
-        except DuosidaApiError as exc:
-            raise HomeAssistantError(str(exc)) from exc
-        self.async_set_updated_data(state)

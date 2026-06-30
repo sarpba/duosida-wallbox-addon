@@ -11,11 +11,9 @@ from homeassistant import config_entries
 from .api import DuosidaApiClient, DuosidaApiError
 from .const import (
     CONF_CHARGER_HOST,
-    CONF_ID_TAG,
     CONF_PORT,
     CONF_PROBE_DURATION,
     DEFAULT_CHARGER_HOST,
-    DEFAULT_ID_TAG,
     DEFAULT_PORT,
     DEFAULT_PROBE_DURATION,
     DOMAIN,
@@ -52,7 +50,6 @@ class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_CHARGER_HOST: host,
                     CONF_PORT: port,
                     CONF_PROBE_DURATION: probe_duration,
-                    CONF_ID_TAG: str(user_input.get(CONF_ID_TAG) or DEFAULT_ID_TAG),
                 }
                 title = (
                     state.data.get("chargePointSerialNumber")
@@ -69,7 +66,6 @@ class DuosidaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     int,
                     vol.Range(min=3, max=60),
                 ),
-                vol.Optional(CONF_ID_TAG, default=DEFAULT_ID_TAG): str,
             }
         )
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)

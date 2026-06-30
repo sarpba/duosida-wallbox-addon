@@ -7,8 +7,7 @@
         "data": {
           "charger_host": "Tolto IP cime",
           "port": "TCP port",
-          "probe_duration": "Probe idotartam",
-          "id_tag": "Remote start ID tag"
+          "probe_duration": "Probe idotartam"
         }
       }
     },
@@ -35,8 +34,6 @@
       "connector_id": { "name": "Csatlakozo ID" },
       "transaction_id": { "name": "Tranzakcio ID" },
       "vendor_transaction_id": { "name": "Gyartoi tranzakcio ID" },
-      "remote_start_status": { "name": "Tavoli inditas allapota" },
-      "remote_stop_status": { "name": "Tavoli leallitas allapota" },
       "configured_max_current": { "name": "Beallitott maximum aram" },
       "configured_max_voltage": { "name": "Beallitott maximum feszultseg" },
       "configured_min_voltage": { "name": "Beallitott minimum feszultseg" },
@@ -53,9 +50,7 @@
       "max_current": { "name": "Maximum aram" }
     },
     "button": {
-      "refresh": { "name": "Frissites" },
-      "start_charging": { "name": "Toltes inditasa" },
-      "stop_charging": { "name": "Toltes leallitasa" }
+      "refresh": { "name": "Frissites" }
     }
   }
 }

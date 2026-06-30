@@ -874,24 +874,6 @@ def build_update_to_flash(client_id: str, message_id: int, update_type: int = 0)
     )
 
 
-def build_remote_start(client_id: str, message_id: int, id_tag: str) -> bytes:
-    inner = encode_field_varint(1, 1) + encode_field_len(2, id_tag.encode("utf-8"))
-    return (
-        encode_field_len(34, inner)
-        + encode_field_len(100, client_id.encode("utf-8"))
-        + encode_field_varint(101, message_id)
-    )
-
-
-def build_remote_stop(client_id: str, message_id: int, transaction_id: int) -> bytes:
-    inner = encode_field_varint(1, transaction_id)
-    return (
-        encode_field_len(36, inner)
-        + encode_field_len(100, client_id.encode("utf-8"))
-        + encode_field_varint(101, message_id)
-    )
-
-
 def build_boot_notification_conf_minimal(message_id: int) -> bytes:
     return encode_field_len(3, encode_field_sint64(1, int(time.time()))) + encode_field_varint(101, message_id)
 
@@ -945,14 +927,6 @@ def build_payload(args: argparse.Namespace) -> bytes:
         if not args.config_key or args.config_value is None:
             raise ValueError(f"--config-key and --config-value are required for mode={args.mode}")
         payload = build_change_configuration(args.client_id, message_id, args.config_key, args.config_value)
-    elif args.mode == "start":
-        if not args.id_tag:
-            raise ValueError("--id-tag is required for mode=start")
-        payload = build_remote_start(args.client_id, message_id, args.id_tag)
-    elif args.mode == "stop":
-        if args.transaction_id is None:
-            raise ValueError("--transaction-id is required for mode=stop")
-        payload = build_remote_stop(args.client_id, message_id, args.transaction_id)
     else:
         raise ValueError(f"unsupported mode: {args.mode}")
     return maybe_wrap(payload, args.transport)
@@ -1150,8 +1124,6 @@ def main() -> None:
             "change-config",
             "set-max-current",
             "set-max-current-direct",
-            "start",
-            "stop",
             "ascii",
         ],
         default="session",
@@ -1173,8 +1145,6 @@ def main() -> None:
         default=[],
         help="Additional trigger to send after session boot. Can be repeated.",
     )
-    parser.add_argument("--id-tag")
-    parser.add_argument("--transaction-id", type=int)
     parser.add_argument("--config-key")
     parser.add_argument("--config-value")
     parser.add_argument("--max-current", type=float)

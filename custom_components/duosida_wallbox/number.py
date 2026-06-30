@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from homeassistant.components.number import NumberDeviceClass, NumberEntity
+from homeassistant.components.number import NumberDeviceClass, NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfElectricCurrent
 from homeassistant.core import HomeAssistant
@@ -31,6 +31,7 @@ class DuosidaMaxCurrentNumber(DuosidaEntity, NumberEntity):
     _attr_native_step = 1
     _attr_native_unit_of_measurement = UnitOfElectricCurrent.AMPERE
     _attr_device_class = NumberDeviceClass.CURRENT
+    _attr_mode = NumberMode.SLIDER
 
     def __init__(self, coordinator: DuosidaDataUpdateCoordinator) -> None:
         super().__init__(coordinator, "max_current")
@@ -40,10 +41,11 @@ class DuosidaMaxCurrentNumber(DuosidaEntity, NumberEntity):
         """Return current max current value."""
         value = self.value("config_maxWorkCurrent")
         try:
-            return float(value)
+            return round(float(value))
         except (TypeError, ValueError):
             return None
 
     async def async_set_native_value(self, value: float) -> None:
         """Set maximum charging current."""
-        await self.coordinator.async_set_max_current(value)
+        current = max(6, min(32, round(value)))
+        await self.coordinator.async_set_max_current(current)

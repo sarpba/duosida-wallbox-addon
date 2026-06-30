@@ -7,8 +7,7 @@
         "data": {
           "charger_host": "Charger IP address",
           "port": "TCP port",
-          "probe_duration": "Probe duration",
-          "id_tag": "Remote start ID tag"
+          "probe_duration": "Probe duration"
         }
       }
     },
@@ -35,8 +34,6 @@
       "connector_id": { "name": "Connector ID" },
       "transaction_id": { "name": "Transaction ID" },
       "vendor_transaction_id": { "name": "Vendor transaction ID" },
-      "remote_start_status": { "name": "Remote start status" },
-      "remote_stop_status": { "name": "Remote stop status" },
       "configured_max_current": { "name": "Configured max current" },
       "configured_max_voltage": { "name": "Configured max voltage" },
       "configured_min_voltage": { "name": "Configured min voltage" },
@@ -53,9 +50,7 @@
       "max_current": { "name": "Maximum current" }
     },
     "button": {
-      "refresh": { "name": "Refresh" },
-      "start_charging": { "name": "Start charging" },
-      "stop_charging": { "name": "Stop charging" }
+      "refresh": { "name": "Refresh" }
     }
   }
 }
