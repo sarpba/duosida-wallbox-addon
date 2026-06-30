@@ -1,0 +1,11 @@
+{
+  "domain": "duosida_wallbox",
+  "name": "Duosida Wallbox",
+  "codeowners": ["@sarpba"],
+  "config_flow": true,
+  "documentation": "https://github.com/sarpba/duosida-wallbox-addon",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/sarpba/duosida-wallbox-addon/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

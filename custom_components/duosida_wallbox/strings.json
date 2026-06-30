@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Duosida Wallbox",
+        "description": "Connect to the Duosida Wallbox add-on HTTP API.",
+        "data": {
+          "base_url": "Add-on API URL",
+          "id_tag": "Remote start ID tag"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the add-on API."
+    },
+    "abort": {
+      "already_configured": "This Duosida Wallbox API is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "charge_status": { "name": "Charge status" },
+      "error_code": { "name": "Error code" },
+      "current": { "name": "Current" },
+      "offered_current": { "name": "Offered current" },
+      "voltage": { "name": "Voltage" },
+      "power": { "name": "Power" },
+      "session_energy": { "name": "Session energy" },
+      "total_energy": { "name": "Total energy" },
+      "frequency": { "name": "Frequency" },
+      "temperature": { "name": "Temperature" },
+      "power_factor": { "name": "Power factor" },
+      "connector_id": { "name": "Connector ID" },
+      "transaction_id": { "name": "Transaction ID" },
+      "vendor_transaction_id": { "name": "Vendor transaction ID" },
+      "configured_max_current": { "name": "Configured max current" },
+      "configured_max_voltage": { "name": "Configured max voltage" },
+      "configured_min_voltage": { "name": "Configured min voltage" },
+      "configured_max_temperature": { "name": "Configured max temperature" },
+      "heartbeat_interval": { "name": "Heartbeat interval" },
+      "meter_sample_interval": { "name": "Meter sample interval" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Online" },
+      "charging": { "name": "Charging" },
+      "fault": { "name": "Fault" }
+    },
+    "number": {
+      "max_current": { "name": "Maximum current" }
+    },
+    "switch": {
+      "charging": { "name": "Charging" }
+    },
+    "button": {
+      "refresh": { "name": "Refresh" }
+    }
+  }
+}

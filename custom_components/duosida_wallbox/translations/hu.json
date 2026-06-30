@@ -1,0 +1,58 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Duosida Wallbox",
+        "description": "Kapcsolodas a Duosida Wallbox add-on HTTP API-hoz.",
+        "data": {
+          "base_url": "Add-on API URL",
+          "id_tag": "Remote start ID tag"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Nem lehet csatlakozni az add-on API-hoz."
+    },
+    "abort": {
+      "already_configured": "Ez a Duosida Wallbox API mar be van allitva."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "charge_status": { "name": "Toltes allapota" },
+      "error_code": { "name": "Hibakod" },
+      "current": { "name": "Aramerosseg" },
+      "offered_current": { "name": "Felajanlott aram" },
+      "voltage": { "name": "Feszultseg" },
+      "power": { "name": "Teljesitmeny" },
+      "session_energy": { "name": "Toltes energiaja" },
+      "total_energy": { "name": "Osszes energia" },
+      "frequency": { "name": "Frekvencia" },
+      "temperature": { "name": "Homerseklet" },
+      "power_factor": { "name": "Teljesitmenytenyezo" },
+      "connector_id": { "name": "Csatlakozo ID" },
+      "transaction_id": { "name": "Tranzakcio ID" },
+      "vendor_transaction_id": { "name": "Gyartoi tranzakcio ID" },
+      "configured_max_current": { "name": "Beallitott maximum aram" },
+      "configured_max_voltage": { "name": "Beallitott maximum feszultseg" },
+      "configured_min_voltage": { "name": "Beallitott minimum feszultseg" },
+      "configured_max_temperature": { "name": "Beallitott maximum homerseklet" },
+      "heartbeat_interval": { "name": "Heartbeat idokoz" },
+      "meter_sample_interval": { "name": "Meresi idokoz" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Online" },
+      "charging": { "name": "Toltes" },
+      "fault": { "name": "Hiba" }
+    },
+    "number": {
+      "max_current": { "name": "Maximum aram" }
+    },
+    "switch": {
+      "charging": { "name": "Toltes" }
+    },
+    "button": {
+      "refresh": { "name": "Frissites" }
+    }
+  }
+}

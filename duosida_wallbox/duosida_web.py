@@ -176,6 +176,71 @@ def set_max_current(charger_host: str, duration: int, max_current: float, client
     }
 
 
+def set_charging(
+    charger_host: str,
+    duration: int,
+    enabled: bool,
+    client_id: str | None,
+    id_tag: str | None = None,
+    transaction_id: int | None = None,
+) -> dict:
+    started = time.time()
+    command_client_id = client_id or "From Python"
+    if enabled:
+        cmd = [
+            sys.executable,
+            str(PROBE),
+            "--host",
+            charger_host,
+            "--mode",
+            "start",
+            "--client-id",
+            command_client_id,
+            "--id-tag",
+            id_tag or "HA",
+            "--duration",
+            str(max(5, min(duration, 8))),
+            "--json",
+        ]
+        command_type = "start_charging"
+        command_value: object = id_tag or "HA"
+    else:
+        if transaction_id is None:
+            raise RuntimeError("charger did not report an active transaction id")
+        cmd = [
+            sys.executable,
+            str(PROBE),
+            "--host",
+            charger_host,
+            "--mode",
+            "stop",
+            "--client-id",
+            command_client_id,
+            "--transaction-id",
+            str(transaction_id),
+            "--duration",
+            str(max(5, min(duration, 8))),
+            "--json",
+        ]
+        command_type = "stop_charging"
+        command_value = transaction_id
+
+    data = run_probe_command(cmd, max(5, min(duration, 8)))
+    return {
+        "ok": True,
+        "data": data,
+        "error": None,
+        "updated_at": time.time(),
+        "duration": round(time.time() - started, 2),
+        "last_command": {
+            "type": command_type,
+            "value": command_value,
+            "status": "Sent",
+            "updated_at": time.time(),
+        },
+    }
+
+
 def poll_once(charger_host: str, duration: int) -> None:
     if not POLL_LOCK.acquire(blocking=False):
         return
@@ -282,10 +347,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
-        if parsed.path != "/api/config/max-current":
-            self.send_error(HTTPStatus.NOT_FOUND)
+        if parsed.path == "/api/config/max-current":
+            self.handle_set_max_current()
             return
+        if parsed.path == "/api/charging/start":
+            self.handle_set_charging(True)
+            return
+        if parsed.path == "/api/charging/stop":
+            self.handle_set_charging(False)
+            return
+        self.send_error(HTTPStatus.NOT_FOUND)
 
+    def handle_set_max_current(self) -> None:
         try:
             payload = self.read_json()
             max_current = float(payload.get("value"))
@@ -317,6 +390,58 @@ class DashboardHandler(BaseHTTPRequestHandler):
             STATE.update(result)
         self.send_json({"ok": True, "state": result})
 
+    def handle_set_charging(self, enabled: bool) -> None:
+        try:
+            payload = self.read_json()
+        except ValueError as exc:
+            self.send_json({"ok": False, "error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            return
+
+        with STATE_LOCK:
+            data = STATE.get("data") if isinstance(STATE.get("data"), dict) else {}
+            client_id = data.get("client_id") or data.get("chargePointSerialNumber")
+            client_id = str(client_id) if client_id else None
+            transaction_id = payload.get("transaction_id") or data.get("transaction_id") or data.get("vendor_transactionId")
+            if transaction_id in {"", 0, "0"}:
+                transaction_id = None
+
+        try:
+            parsed_transaction_id = int(transaction_id) if transaction_id is not None else None
+        except (TypeError, ValueError):
+            self.send_json({"ok": False, "error": "transaction_id must be an integer"}, HTTPStatus.BAD_REQUEST)
+            return
+
+        id_tag = payload.get("id_tag")
+        if id_tag is not None and not isinstance(id_tag, str):
+            self.send_json({"ok": False, "error": "id_tag must be a string"}, HTTPStatus.BAD_REQUEST)
+            return
+
+        try:
+            with POLL_LOCK:
+                result = set_charging(
+                    self.charger_host,
+                    self.probe_duration,
+                    enabled,
+                    client_id,
+                    id_tag=id_tag,
+                    transaction_id=parsed_transaction_id,
+                )
+        except Exception as exc:
+            with STATE_LOCK:
+                STATE["ok"] = False
+                STATE["error"] = str(exc)
+                STATE["updated_at"] = time.time()
+            self.send_json({"ok": False, "error": str(exc)}, HTTPStatus.BAD_GATEWAY)
+            return
+
+        with STATE_LOCK:
+            current_data = STATE.get("data") if isinstance(STATE.get("data"), dict) else {}
+            merged_data = dict(current_data)
+            if isinstance(result.get("data"), dict):
+                merged_data.update(result["data"])
+            result["data"] = merged_data
+            STATE.update(result)
+        self.send_json({"ok": True, "state": result})
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Duosida charger local dashboard.")

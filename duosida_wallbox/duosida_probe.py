@@ -654,6 +654,8 @@ def update_state_from_decoded(decoded: Dict[str, object], state: Dict[str, objec
     if data_case == "MeterValuesReq":
         if "connectorId" in data:
             state["connector_id"] = data["connectorId"]
+        if "transactionId" in data:
+            state["transaction_id"] = data["transactionId"]
         for meter_value in data.get("meterValues", []):
             if not isinstance(meter_value, dict):
                 continue
